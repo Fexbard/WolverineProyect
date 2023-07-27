@@ -1,38 +1,57 @@
 package com.proyect.wolverine.controller;
 
 import com.proyect.wolverine.entity.Persona;
+import com.proyect.wolverine.repository.PersonaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @RestController
+@RequestMapping(value = "/api")
 public class PersonaController {
+
+    @Autowired
+     PersonaRepository personaRepository;
 
     // mostrar a todas las personas
     @GetMapping("/personas")
-public  String getPersonas(){
-    return "aquí todas las persona";
+public List<Persona> getPersonas(){
+        return personaRepository.findAll();
 }
-    //busque sólo una persona via ID
     @GetMapping("/personas/{id}")
-    public  String getPersona(@PathVariable Long id){
-    return "aquí una persona";
-    }
-    // agregue una persona
+    public ResponseEntity<Persona> getPersona(@PathVariable Long id){
+    Persona personaEncontrada = personaRepository.getPersonaById(id);
+    return ResponseEntity.ok(personaEncontrada);
+    };
+
     @PostMapping("/personas")
-    // modifique a la persona por medio de su ID
-//el post guardará la información donde el método indique
-    public String  createPersona( @RequestBody Persona persona){
-    return "persona creada";
+    public ResponseEntity<Persona> createPersona( @RequestBody Persona persona){
+        personaRepository.save(persona);
+    return ResponseEntity.ok().build();
     }
-    //modificación a la persona
 
     @PutMapping("/personas/{id}")
-       public String modifyPersona(@RequestBody Persona persona, @PathVariable Long id){
-         return "persona MODIFICADA";
+       public ResponseEntity<?> modifyPersona(@RequestBody Persona personaUpdate, @PathVariable Long id){
+        Persona personaEncontrada = personaRepository.getPersonaById(id);
+
+        personaEncontrada.setName(personaUpdate.getName());
+        personaEncontrada.setLastName(personaUpdate.getLastName());
+        personaEncontrada.setEmail(personaUpdate.getEmail());
+        personaEncontrada.setPhone(personaUpdate.getPhone());
+        personaEncontrada.setAddress(personaUpdate.getAddress());
+        personaEncontrada.setDni(personaUpdate.getDni());
+        Persona personaModificada = personaRepository.save(personaEncontrada);
+
+    return ResponseEntity.ok().build();
      }
 
-    //Elimine a una persona por medio de su ID
     @DeleteMapping("/personas/{id}")
     public String modifyPersona(@PathVariable Long id){
-        return "persona MODIFICADA";
+        Persona personaEliminar = personaRepository.getPersonaById(id);
+        personaRepository.delete(personaEliminar);
+        return "El usuario"+personaEliminar+ "ha sido eliminado";
     }
     }
 

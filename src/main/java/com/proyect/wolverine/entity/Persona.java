@@ -21,5 +21,5 @@ public class Persona {
     String email;
     String phone;
     String address;
-    String DNI;
+    String dni;
 }
